@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+  
+  <script>
+    // Отправка клика на Counter API
+    fetch("https://app.counterapi.dev/team/muhammadali-muhammadsidikovs-team/counters/riporaiti/click", {
+      method: "POST"
+    })
+    .then(response => response.json())
+    .then(data => console.log("Клики:", data.value))
+    .catch(err => console.log("Ошибка Counter API:", err));
+
+    // Редирект на GitHub Pages через 1 секунду
+    setTimeout(() => {
+      window.location.href = "https://muhammadsidikov370-spec.github.io/riporaiti/";
+    }, 1000);
+  </script>
+
+  <style>
+    body {
+      background: #faf4e8; /* нежный молочный фон */
+      color: #4a2f1e;      /* тёмно-коричневый текст */
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Redirecting...</h2>
+  <p>Переход на сайт RIPO RAITI...</p>
+</body>
+</html>
