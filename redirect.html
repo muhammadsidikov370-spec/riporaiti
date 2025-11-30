@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Redirecting...</title>
+<style>
+  body { background:#faf4e8; color:#4a2f1e; font-family:Arial, sans-serif; text-align:center; padding-top:100px; }
+</style>
+</head>
+<body>
+  <h2>Redirecting...</h2>
+  <p>Переход на сайт...</p>
+
+<script>
+(async function(){
+  const teamBase = "https://app.counterapi.dev/team/muhammadali-muhammadsidikovs-team/counters";
+  const key = "first-counter-1832"; // твой key
+  const hitUrl = `${teamBase}/${encodeURIComponent(key)}/hit`; // endpoint для увеличения
+  const fallbackUrl = `${teamBase}/${encodeURIComponent(key)}`; // посмотреть значение
+
+  // 1) Попробовать navigator.sendBeacon — работает во время закрытия/редиректа
+  try {
+    if (navigator.sendBeacon) {
+      // sendBeacon автоматически делает POST без блокировки (нет обещания на ответ)
+      navigator.sendBeacon(hitUrl);
+      console.log("Counter: sendBeacon отправлен");
+    }
+  } catch (e) {
+    console.warn("sendBeacon error", e);
+  }
+
+  // 2) Попробовать fetch с keepalive (если поддерживается)
+  let fetchOk = false;
+  try {
+    // keepalive позволяет успешно отправлять запрос во время unload/redirect в современных браузерах
+    const resp = await fetch(hitUrl, { method: "POST", mode: "cors", keepalive: true });
+    if (resp && (resp.status === 200 || resp.status === 201 || resp.status === 204)) {
+      fetchOk = true;
+      console.log("Counter: fetch POST ok", resp.status);
+    } else {
+      console.warn("Counter: fetch POST status", resp && resp.status);
+    }
+  } catch (err) {
+    console.warn("Counter: fetch POST failed", err);
+  }
+
+  // 3) Если fetch не сработал — попытаться простым GET к endpoint, иногда сервис поддерживает /hit GET
+  if (!fetchOk) {
+    try {
+      const resp2 = await fetch(hitUrl, { method: "GET", mode: "cors", keepalive: true });
+      if (resp2 && (resp2.status === 200 || resp2.status === 201)) {
+        fetchOk = true;
+        console.log("Counter: GET /hit ok", resp2.status);
+      } else {
+        console.warn("Counter: GET /hit status", resp2 && resp2.status);
+      }
+    } catch (err) {
+      console.warn("Counter: GET /hit failed", err);
+    }
+  }
+
+  // 4) Если ничего не удалось — кратко подождать 800 мс, чтобы sendBeacon/пассивные запросы сработали
+  // (если fetch уже сработал, можно перенаправить сразу)
+  const redirectTo = "https://muhammadsidikov370-spec.github.io/riporaiti/";
+  if (fetchOk) {
+    window.location.href = redirectTo;
+  } else {
+    // подождём 800 ms и редиректим
+    setTimeout(() => { window.location.href = redirectTo; }, 800);
+  }
+})();
+</script>
+</body>
+</html>
